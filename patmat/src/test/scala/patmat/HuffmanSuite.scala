@@ -35,11 +35,43 @@ class HuffmanSuite extends munit.FunSuite:
     assertEquals(combine(leaflist), List(Fork(Leaf('e',1),Leaf('t',2),List('e', 't'),3), Leaf('x',4)))
   }
 
+  test("create code tree") {
+    assertEquals(createCodeTree(string2Chars("xxetxxt")), Fork(Fork(Leaf('e',1),Leaf('t',2),List('e', 't'),3), Leaf('x',4), List('e', 't', 'x'), 7))
+  }
+
+  test("decode text") {
+    new TestTrees :
+      assertEquals(decode(frenchCode, secret), string2Chars("huffmanestcool"))
+  }
+
+  test("encode 'ex' word with tree") {
+    assertEquals(encode(createCodeTree(string2Chars("xxetxxt")))(string2Chars("ex")), List(0, 0, 1))
+  }
+
+  test("char to bits - easy path") {
+    val codeTable = List(('a', List(0,1)), ('b', List(0,0)), ('c', List(1,1)))
+    assertEquals(codeBits(codeTable)('a'), List(0, 1))
+  }
+
+  test("char to bits - hard path") {
+    val codeTable = List(('a', List(0, 1)), ('b', List(0, 0)), ('c', List(1, 1)))
+    assertEquals(codeBits(codeTable)('c'), List(1, 1))
+  }
+
+  test("convert tree to table") {
+    assertEquals(convert(createCodeTree(string2Chars("xxetxxt"))), List(('e', List(0,0)), ('t', List(0,1)), ('x', List(1))))
+  }
 
   test("decode and encode a very short text should be identity (10pts)") {
     new TestTrees:
       assertEquals(decode(t1, encode(t1)("ab".toList)), "ab".toList)
   }
+
+  test("decode and quick encode a very short text should be identity") {
+    new TestTrees :
+      assertEquals(decode(t1, quickEncode(t1)("ab".toList)), "ab".toList)
+  }
+
 
 
   import scala.concurrent.duration.*
